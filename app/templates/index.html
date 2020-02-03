@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../static/bootstrap/cerulean.bootstrap.min.css">
+    <!-- DateRangePicker CSS -->
+    <link rel="stylesheet" type="text/css" href="../static/daterangepicker/daterangepicker.css" />
+
+    <!-- TODO: Move to custom.css -->
+    <!-- <link rel="stylesheet" href="../static/bootstrap/custom.css"> -->
+    <style>
+      body{
+        padding-top:10px
+      }
+      .form-control {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      .btn{
+        margin-right: 10px;
+      }
+      .btn-sm{
+        margin-right: 0px;
+      }
+    </style>
+
+    <title>Журнал входящих дел</title>
+  </head>
+  <body>
+
+    <!-- NAVIGATION BAR -->
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+        <div class="container">
+            <a href="../" class="navbar-brand">Журнал поступивших дел</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="user_settings" aria-expanded="false">Настройки <span class="caret"></span></a>
+                        <div class="dropdown-menu" aria-labelledby="user_settings">
+                            <a class="dropdown-item" href="#">Пользователь</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="">Текущий год</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- INPUT FORM -->
+    <div class="jumbotron" style='height:250px'>
+    <div class="container">
+      <div class="row">
+        <div id='input_form' class="col-12">
+            <form id="add_record_form" action="{{ url_for('case_add')}}" method="POST">
+                <fieldset>
+                    <div class="form-group row">
+                        <!-- Номер по журналу -->
+                        <label for="record_num" class="col-form-label">Номер по журналу:</label>
+                        <div>
+                          <input type="text" class="form-control" id="record_num" name="record_num" value="{{ last_num+1 }}" style='width:70px' required>
+                        </div>
+                        <!-- Дата поступления -->
+                        <label for="case_in_date" class="col-form-label">Дата поступления:</label>
+                        <div>
+                          <input type="text" class="form-control" id="case_in_date" name="case_in_date" style='width:110px' required>
+                          <!-- <div class="invalid-feedback">Обязательное поле</div> -->
+                        </div>
+                        <!-- Поступило из -->
+                        <label for="court_name" class="col-form-label">Поступило из:</label>
+                        <div>
+                            <select class="custom-select form-control" id="court_name" name="court_name" style="width:460px"
+                              data-toggle="tooltip" title="Обязательное поле" required>
+                                <option value="0" selected="selected">Выберите организацию:</option>
+                                <option value="-1">список не загружен</option>
+                            </select>
+                        </div>
+
+                        <!-- add_company button -->
+                        <button type="button" class="btn btn-primary" id="add_company" style="width:40px" data-toggle="modal" data-target="#add_company_modal">+</button>
+
+                    </div>
+
+
+                    <div class="form-group row">
+                      <!-- Номер дела -->
+                      <label for="case_num" class="col-form-label">Номер дела:</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_num" name="case_num" style='width:80px' required>
+                      </div>
+                      <!-- Год -->
+                      <label for="case_year" class="col-form-label">Год:</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_year" name="case_year" style='width:60px' value="{{ current_year }}" required>
+                      </div>
+                      <!-- Содержание (в отношении/по иску) -->
+                      <label for="case_person" class="col-form-label">Содержание (в отношении/по иску):</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_person" name="case_person" style='width:380px' required>
+                      </div>
+                      <!-- Кол-во томов -->
+                      <label for="case_book_num" class="col-form-label">Кол-во томов:</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_book_num" name="case_book_num" style='width:40px' value="1" required>
+                      </div>
+                    </div>
+
+                    <div class="form-group row">
+                      <!-- Передано -->
+                      <label for="empl_name" class="col-form-label">Передано:</label>
+                      <div>
+                          <select class="custom-select form-control" id="empl_name" name="empl_name" style="width:300px">
+                              <option value="0" selected="selected">Выберите сотрудника:</option>
+                              <option value="-1">список не загружен</option>
+                          </select>
+                      </div>
+                      
+                      <!-- add_employee button -->
+                      <button type="button" class="btn btn-primary" id="add_employee" style="width:40px" data-toggle="modal" data-target="#add_empl_modal">+</button>
+
+                      <!-- Примечание -->
+                      <label for="comments" class="col-form-label">Примечание:</label>
+                      <div>
+                          <input type="text" class="form-control" id="comments" name="comments" style='width:350px'>
+                      </div>
+                      <!-- SUBMIT -->
+                      <button type="submit" class="btn btn-success form-control" style="width:200px"> Добавить в журнал </button>
+                      <!-- <button type="reset" class="btn btn-success form-control" style="width:100px"> Clear </button> -->
+                    </div>
+
+                </fieldset>
+            </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    <!-- CASE LIST -->
+    <div class="container-fluid">
+      <div class="row">
+          <div id='case-list' class="col-md-12">
+            <form id="print_sel_form" action="{{ url_for('print_form')}}" method="post">
+              <input id='submit_pf' type='submit' name='submit_pf' class="btn btn-secondary" style='width:180px' value='Печать'/>
+              <table class="table table-bordered table-hover table-sm table-striped">
+                  <thead class="text-center small">
+                    <tr>
+                      <th scope="col" class="align-middle">№</th>
+                      <th scope="col" class="align-middle">Дата<br>поступле-<br>ния</th>
+                      <th scope="col" class="align-middle">Поступило из</th>
+                      <th scope="col" class="align-middle" colspan="2">№ дела</th>
+                      <th scope="col" class="align-middle">К-во<br>томов</th>
+                      <th scope="col" class="align-middle">Содержание</th>
+                      <th scope="col" class="align-middle">Передано</th>
+                      <th scope="col" class="align-middle">Примечание</th>
+                      <th scope="col" class="align-middle"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    
+                    {% for case in case_list.items %}
+                    <tr class="text-center small">
+                      <th scope="row">
+                        <a href="{{ url_for('record_edit_form', record_id=case.record_id, ret_page=case_list.page) }}">{{ case.record_num_thru_year }}</a>
+                      </th>
+                      <td>
+                        {# represent date yyyy-mm-dd as dd.mm.yyyy #}
+                        {% set date_str = case.case_in_date|string() %}
+                        {{ date_str[8:] }}.{{ date_str[5:7] }}.{{ date_str[0:4] }}
+                        <!-- {{ case.case_in_date }} -->
+                      </td>
+                      <td class="text-left">{{ case.case_court.court_name }} ({{ case.case_court.locality }})</td>
+                      <td>{{ case.case_num }}</td>
+                      <td>{{ case.case_year }}</td>
+                      <td>{{ case.case_books_num }}</td>
+                      <td class="text-left">{{ case.case_person }}</td>
+                      <td>{{ case.empl.fio }}</td>
+                      <td class="text-left">{{ case.comments }}</td>
+                      <td><input type="checkbox" name="row_checked" value="{{ case.record_id }}"></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </form>
+          </div>
+      </div>
+    </div>
+
+    <!-- PAGINATION -->
+    <nav aria-label="..." class="d-flex justify-content-center">
+      <ul class="pagination">
+        {% set current_page = case_list.page %}
+        {% for page in case_list.iter_pages(left_edge=3, right_edge=3, left_current=2, right_current=2) %}
+            {% if page %}
+              {% if page == current_page %}
+                <li class="page-item active"><a class="page-link" href="{{ url_for('index', page=page) }}">{{ page }}</a></li>
+              {% else %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('index', page=page) }}">{{ page }}</a></li>
+              {% endif %}
+            {% else %}
+              <li class="page-item"><a class="page-link" href="#">...</a></li>
+            {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+
+
+    <!-- Modal "Add company" -->
+    <div class="modal fade" id="add_company_modal" tabindex="-1" role="dialog" aria-labelledby="add_company_modal_label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <form id='add_company_form'>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="add_company_modal_label">Добавить организацию</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="form-group">
+                <label for="company_name">Название организации</label>
+                <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Введите название" required>
+              </div>
+              <div class="form-group">
+                <label for="company_locality">Город</label>
+                <input type="text" class="form-control" id="company_locality" name="company_locality" placeholder="Введите город (необязательно)">
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+          </div>
+        </div>
+      </form>
+      </div>
+    </div>
+
+
+    <!-- Modal "Add employee" -->
+    <div class="modal fade" id="add_empl_modal" tabindex="-1" role="dialog" aria-labelledby="add_empl_modal_label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <form id='add_empl_form'>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="add_empl_modal_label">Добавить сотрудника</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="form-group">
+                <label for="empl_fio">ФИО сотрудника:</label>
+                <input type="text" class="form-control" id="empl_fio" name="empl_fio" placeholder="Введите ФИО" required>
+              </div>
+              <div class="form-group">
+                <label for="empl_comment">Примечание:</label>
+                <input type="text" class="form-control" id="empl_comment" name="empl_comment" placeholder="Введите примечание (необязательно)">
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+          </div>
+        </div>
+      </form>
+      </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="../static/bootstrap/jquery-1.12.4.min.js"></script>
+    <script src="../static/bootstrap/popper.min.js"></script>
+    <script src="../static/bootstrap/bootstrap.min.js"></script>
+    <!-- 
+      DateRange picker
+      A JavaScript component for choosing date ranges, dates and times.
+      https://github.com/dangrossman/daterangepicker
+    -->
+    <script type="text/javascript" src="../static/daterangepicker/moment.min.js"></script>
+    <script type="text/javascript" src="../static/daterangepicker/daterangepicker.min.js"></script>
+
+    <!-- JS helper functions -->
+    <script type="text/javascript" src="../static/main.js"></script>
+    
+    <!-- TODO: move to main.js file -->
+    <script type="text/javascript">
+      // on page loading
+      $(document).ready(function(){
+        
+        // lists preloading
+        loadCourtList(0);
+        loadEmplList(0);
+
+        // date picker setup
+        $('#case_in_date').daterangepicker({
+          "singleDatePicker": true,
+          "locale": {
+            "format": "DD.MM.YYYY",
+            "daysOfWeek": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+            "monthNames": ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+            "firstDay": 1 // week starts monday
+          },
+          "startDate": moment() // current date
+        }
+          //,
+          // DEBUG Console logging
+          // function(start, end, label) {
+          //    console.log('New date selected: ' + start.format('YYYY-MM-DD'));
+          // }
+        );
+
+      }); // end (document).ready()
+      
+    </script>
+
+  </body>
+</html>

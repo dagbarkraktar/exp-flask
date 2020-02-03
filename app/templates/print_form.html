@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Форма для печати</title>
+    <style type="text/css">
+        table.printform { 
+            font: 10pt sans-serif; 
+            margin: 1em 1em 1em 0;
+            border-collapse: collapse;
+        }
+
+        .printform td, th { 
+            border: 1px #000 solid;
+            padding: 0.2em; 
+        }
+
+        .printform th { 
+            background: #fff;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <center><h2>Список поступивших дел</h2></center>
+    <center>
+        <table class='printform'>
+            <tr>
+                <th>№ п/п</th>
+                <th>Дата<br>поступления</th>
+                <th>Поступило из</th>
+                <th>Номер<br>дела</th>
+                <th>Содержание</th>
+                <th>Кол-во<br>томов</th>
+                <th>Кому<br>передано</th>
+                <th>Дата<br>передачи</th>
+                <th>Роспись<br>о получении</th>
+                <th>Примечание</th>
+            </tr>
+            {% for record in pf_list %}
+            <tr>
+                <td align='center'>{{ record.record_num_thru_year }}</td>
+                <td align='center'>
+                    {# represent date yyyy-mm-dd as dd.mm.yyyy #}
+                    {% set date_str = record.case_in_date|string() %}
+                    {{ date_str[8:] }}.{{ date_str[5:7] }}.{{ date_str[0:4] }}
+                </td>
+                <td>{{ record.case_court}}</td>
+                <td align='center'>{{ record.case_num}}/{{ record.case_year}}</td>
+                <td>{{ record.case_person}}</td>
+                <td align='center'>{{ record.case_books_num}}</td>
+                <td align='center'>{{ record.empl}}</td>
+                <td></td>
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;</td>
+                <td></td>
+            </tr>                
+            {% endfor %}
+        </table>
+    </center>
+</body>
+</html>
