@@ -28,8 +28,9 @@ class ExpInCase(db.Model):
     empl_id = db.Column(db.Integer, db.ForeignKey("employees.empl_id"))
     empl = db.relationship("EmplModel", backref="exp_in_cases", lazy="joined")
     comments = db.Column(db.String(255))
-    sending_type = db.column(db.Integer)
-    sending_comments = db.column(db.String(128))
+    sending_date = db.Column(db.DateTime)
+    sending_type = db.Column(db.Integer)
+    sending_comments = db.Column(db.String(128))
 
     def __init__(self, record_num_thru_year, case_in_date, case_court_id,
                     case_num, case_year, case_books_num, case_person, empl_id, comments):
