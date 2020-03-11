@@ -5,8 +5,6 @@ import os
 
 import utils
 from config import Config
-import models
-
 
 app = Flask(__name__)
 
@@ -23,6 +21,9 @@ app.config["SQLALCHEMY_POOL_RECYCLE"] = 300
 app.config["SQLALCHEMY_MAX_OVERFLOW"] = 30
 
 db = SQLAlchemy(app)
+
+# import models after creating db object
+import models
 
 # beginning of current year YYYY-MM-DD
 first_january = f"{Config.CURRENT_YEAR}-01-01"
