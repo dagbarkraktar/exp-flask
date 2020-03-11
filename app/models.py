@@ -28,6 +28,12 @@ class ExpInCase(db.Model):
     empl_id = db.Column(db.Integer, db.ForeignKey("employees.empl_id"))
     empl = db.relationship("EmplModel", backref="exp_in_cases", lazy="joined")
     comments = db.Column(db.String(255))
+    """ SQL for adding sending_* columns
+    ALTER TABLE `exp_in_cases`
+    ADD COLUMN `sending_date` DATE NULL DEFAULT NULL AFTER `comments`,
+    ADD COLUMN `sending_type` INT(11) NULL DEFAULT '0' AFTER `sending_date`,
+    ADD COLUMN `sending_comments` VARCHAR(128) NULL AFTER `sending_type`;
+    """
     sending_date = db.Column(db.DateTime)
     sending_type = db.Column(db.Integer)
     sending_comments = db.Column(db.String(128))

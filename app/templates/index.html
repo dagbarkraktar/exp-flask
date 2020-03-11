@@ -160,6 +160,8 @@
                       <th scope="col" class="align-middle">Содержание</th>
                       <th scope="col" class="align-middle">Передано</th>
                       <th scope="col" class="align-middle">Примечание</th>
+                      <th scope="col" class="align-middle" colspan="2">Отправлено</th>
+                      <th scope="col" class="align-middle">Примечание</th>
                       <th scope="col" class="align-middle"></th>
                     </tr>
                   </thead>
@@ -183,6 +185,10 @@
                       <td class="text-left">{{ case.case_person }}</td>
                       <td>{{ case.empl.fio }}</td>
                       <td class="text-left">{{ case.comments }}</td>
+                      <!-- Sending information -->
+                      <td>DD-MM-YYY</td>
+                      <td>почтой</td>
+                      <!-- Printform checkbox -->
                       <td><input type="checkbox" name="row_checked" value="{{ case.record_id }}"></td>
                     </tr>
                     {% endfor %}
