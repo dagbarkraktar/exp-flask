@@ -29,27 +29,33 @@ import models
 first_january = f"{Config.CURRENT_YEAR}-01-01"
 year_last_day = f"{Config.CURRENT_YEAR}-12-31"
 
+
 # root
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-
-    print(f"Client addr:{request.remote_addr}")
+    print(f'Client addr:{request.remote_addr}')
 
     #  get last number in case journal
     last_num = get_last_number()
 
     # get current page number (form GET request)
     cur_page = request.args.get('page', 1, type=int)
+    try:
+        # SELECT ... WHERE case_in_date > YYYY-01-01
+        case_list = (db.session.query(models.ExpInCase)
+                     .filter(models.ExpInCase.case_in_date > first_january)
+                     .filter(models.ExpInCase.case_in_date < year_last_day)
+                     .order_by(models.ExpInCase.record_id.desc())
+                     .paginate(page=cur_page, per_page=Config.ROWS_PER_PAGE, error_out=False))
+    except Exception as e:
+        print(f'Error occurred: {e}')
+        case_list = None
 
-    # SELECT ... WHERE case_in_date > YYYY-01-01
-    case_list = db.session.query(models.ExpInCase) \
-                .filter(models.ExpInCase.case_in_date > first_january) \
-                .filter(models.ExpInCase.case_in_date < year_last_day) \
-                .order_by(models.ExpInCase.record_id.desc()) \
-                .paginate(page=cur_page, per_page=Config.ROWS_PER_PAGE, error_out=False)
-
-    return render_template("index.html", current_year=Config.CURRENT_YEAR, case_list=case_list, last_num=last_num)
+    return render_template("index.html",
+                           current_year=Config.CURRENT_YEAR,
+                           case_list=case_list,
+                           last_num=last_num)
 
 
 # record_edit_form
@@ -81,7 +87,7 @@ def courts():
         # SELECT * ...
         response = db.session.query(models.CourtModel).all()
         for court in response:
-            court_list.append({"id":court.id, "name":f"{court.court_name} ({court.locality})"})
+            court_list.append({"id": court.id, "name": f"{court.court_name} ({court.locality})"})
 
         return json.dumps(court_list)
     
@@ -174,6 +180,7 @@ def case_update():
     # redirect back to page in case list
     return redirect(url_for("index", page=ret_page_num))
 
+
 @app.route("/case_add", methods=['POST',])
 def case_add():
 
@@ -197,9 +204,10 @@ def case_add():
         comments = form_data['comments']
 
         # Create
-        case_record = models.ExpInCase(record_num_thru_year=record_num_thru_year, case_in_date=case_in_date, \
-            case_court_id=case_court_id, case_num=case_num, case_year=case_year, case_books_num=case_books_num, \
-            case_person=case_person, empl_id=empl_id, comments=comments)
+        case_record = models.ExpInCase(record_num_thru_year=record_num_thru_year, case_in_date=case_in_date,
+                                       case_court_id=case_court_id, case_num=case_num, case_year=case_year,
+                                       case_books_num=case_books_num, case_person=case_person, empl_id=empl_id,
+                                       comments=comments)
 
         # Add record to db
         db.session.add(case_record)
@@ -224,7 +232,7 @@ def print_form():
 
         print_form_list = db.session.query(models.ExpInCase).filter(or_(*filter_list)).all()
 
-        print(f"PF List: {print_form_list}")
+        # print(f"PF List: {print_form_list}")
 
         # render print form template
         return render_template("print_form.html", pf_list=print_form_list)
@@ -235,9 +243,13 @@ def get_last_number():
     Helper function.
     Return: value of last record_num_thru_year
     """
-    last_rec = db.session.query(models.ExpInCase) \
-        .filter(models.ExpInCase.case_in_date > first_january) \
-        .order_by(models.ExpInCase.record_num_thru_year.desc()).first()
+    try:
+        last_rec = (db.session.query(models.ExpInCase)
+                    .filter(models.ExpInCase.case_in_date > first_january)
+                    .order_by(models.ExpInCase.record_num_thru_year.desc()).first())
+    except Exception as e:
+        print(f'Error occurred: {e}')
+        return
 
     return last_rec.record_num_thru_year
 
