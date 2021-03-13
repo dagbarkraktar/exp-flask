@@ -1,0 +1,73 @@
+<!-- CASE LIST -->
+<div class="container-fluid">
+  <div class="row">
+      <div id='case-list' class="col-md-12">
+        <form id="print_sel_form" action="{{ url_for('print_form')}}" method="post">
+          <input id='submit_pf' type='submit' name='submit_pf' class="btn btn-secondary" style='width:180px' value='Печать'/>
+          <table class="table table-bordered table-hover table-sm table-striped">
+              <thead class="text-center small">
+                <tr>
+                  <th scope="col" class="align-middle">№</th>
+                  <th scope="col" class="align-middle">Дата<br>поступле-<br>ния</th>
+                  <th scope="col" class="align-middle">Поступило из</th>
+                  <th scope="col" class="align-middle" colspan="2">№ дела</th>
+                  <th scope="col" class="align-middle">К-во<br>томов</th>
+                  <th scope="col" class="align-middle">Содержание</th>
+                  <th scope="col" class="align-middle">Передано</th>
+                  <th scope="col" class="align-middle">Примечание</th>
+                  <th scope="col" class="align-middle" colspan="2">Отправлено</th>
+                  <th scope="col" class="align-middle">Примечание</th>
+                  <th scope="col" class="align-middle"></th>
+                </tr>
+              </thead>
+              <tbody>
+
+                {% for case in case_list.items %}
+                <tr class="text-center small">
+                  <th scope="row">
+                    <a href="{{ url_for('record_edit_form', record_id=case.record_id, ret_page=case_list.page) }}">{{ case.record_num_thru_year }}</a>
+                  </th>
+                  <td>
+                    {# represent date yyyy-mm-dd as dd.mm.yyyy #}
+                    {% set date_str = case.case_in_date|string() %}
+                    {{ date_str[8:] }}.{{ date_str[5:7] }}.{{ date_str[0:4] }}
+                    <!-- {{ case.case_in_date }} -->
+                  </td>
+                  <td class="text-left">{{ case.case_court.court_name }} ({{ case.case_court.locality }})</td>
+                  <td>{{ case.case_num }}</td>
+                  <td>{{ case.case_year }}</td>
+                  <td>{{ case.case_books_num }}</td>
+                  <td class="text-left">{{ case.case_person }}</td>
+                  <td>{{ case.empl.fio }}</td>
+                  <td class="text-left">{{ case.comments }}</td>
+                  <!-- Sending information -->
+                  <td>DD-MM-YYY</td>
+                  <td>почтой</td>
+                  <!-- Printform checkbox -->
+                  <td><input type="checkbox" name="row_checked" value="{{ case.record_id }}"></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </form>
+      </div>
+  </div>
+</div>
+
+<!-- PAGINATION -->
+<nav aria-label="..." class="d-flex justify-content-center">
+  <ul class="pagination">
+    {% set current_page = case_list.page %}
+    {% for page in case_list.iter_pages(left_edge=3, right_edge=3, left_current=2, right_current=2) %}
+        {% if page %}
+          {% if page == current_page %}
+            <li class="page-item active"><a class="page-link" href="{{ url_for('index', page=page) }}">{{ page }}</a></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('index', page=page) }}">{{ page }}</a></li>
+          {% endif %}
+        {% else %}
+          <li class="page-item"><a class="page-link" href="#">...</a></li>
+        {% endif %}
+    {% endfor %}
+  </ul>
+</nav>

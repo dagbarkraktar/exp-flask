@@ -1,0 +1,89 @@
+<!-- INPUT FORM -->
+<div class="jumbotron" style='height:250px'>
+    <div class="container">
+      <div class="row">
+        <div id='input_form' class="col-12">
+            <form id="add_record_form" action="{{ url_for('case_add')}}" method="POST">
+                <fieldset>
+                    <div class="form-group row">
+                        <!-- Номер по журналу -->
+                        <label for="record_num" class="col-form-label">Номер по журналу:</label>
+                        <div>
+                          {% if last_num %}{% set next_number = last_num + 1 %}{% endif %}
+                          <input type="text" class="form-control" id="record_num" name="record_num" value="{{ next_number }}" style='width:70px' required>
+                        </div>
+                        <!-- Дата поступления -->
+                        <label for="case_in_date" class="col-form-label">Дата поступления:</label>
+                        <div>
+                          <input type="text" class="form-control" id="case_in_date" name="case_in_date" style='width:110px' required>
+                          <!-- <div class="invalid-feedback">Обязательное поле</div> -->
+                        </div>
+                        <!-- Поступило из -->
+                        <label for="court_name" class="col-form-label">Поступило из:</label>
+                        <div>
+                            <select class="custom-select form-control" id="court_name" name="court_name" style="width:460px"
+                              data-toggle="tooltip" title="Обязательное поле" required>
+                                <option value="0" selected="selected">Выберите организацию:</option>
+                                <option value="-1">список не загружен</option>
+                            </select>
+                        </div>
+
+                        <!-- add_company button -->
+                        <button type="button" class="btn btn-primary" id="add_company" style="width:40px" data-toggle="modal" data-target="#add_company_modal">+</button>
+
+                    </div>
+
+
+                    <div class="form-group row">
+                      <!-- Номер дела -->
+                      <label for="case_num" class="col-form-label">Номер дела:</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_num" name="case_num" style='width:80px' required>
+                      </div>
+                      <!-- Год -->
+                      <label for="case_year" class="col-form-label">Год:</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_year" name="case_year" style='width:60px' value="{{ current_year }}" required>
+                      </div>
+                      <!-- Содержание (в отношении/по иску) -->
+                      <label for="case_person" class="col-form-label">Содержание (в отношении/по иску):</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_person" name="case_person" style='width:380px' required>
+                      </div>
+                      <!-- Кол-во томов -->
+                      <label for="case_book_num" class="col-form-label">Кол-во томов:</label>
+                      <div>
+                        <input type="text" class="form-control" id="case_book_num" name="case_book_num" style='width:40px' value="1" required>
+                      </div>
+                    </div>
+
+                    <div class="form-group row">
+                      <!-- Передано -->
+                      <label for="empl_name" class="col-form-label">Передано:</label>
+                      <div>
+                          <select class="custom-select form-control" id="empl_name" name="empl_name" style="width:300px">
+                              <option value="0" selected="selected">Выберите сотрудника:</option>
+                              <option value="-1">список не загружен</option>
+                          </select>
+                      </div>
+
+                      <!-- add_employee button -->
+                      <button type="button" class="btn btn-primary" id="add_employee" style="width:40px" data-toggle="modal" data-target="#add_empl_modal">+</button>
+
+                      <!-- Примечание -->
+                      <label for="comments" class="col-form-label">Примечание:</label>
+                      <div>
+                          <input type="text" class="form-control" id="comments" name="comments" style='width:350px'>
+                      </div>
+                      <!-- SUBMIT -->
+                      <button type="submit" class="btn btn-success form-control" style="width:200px"> Добавить в журнал </button>
+                      <!-- <button type="reset" class="btn btn-success form-control" style="width:100px"> Clear </button> -->
+                    </div>
+
+                </fieldset>
+            </form>
+
+        </div>
+      </div>
+    </div>
+</div>
